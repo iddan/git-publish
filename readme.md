@@ -1,6 +1,6 @@
 # Git Publish
 
-Publish packages to a dedicated GitHub branch instead of to NPM
+Publish packages to a dedicated Git branch instead of to NPM
 
 ```bash
 npm install --save-dev git-publish
