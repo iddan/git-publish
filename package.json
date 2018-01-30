@@ -1,6 +1,6 @@
 {
   "name": "@iddan/git-publish",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "main": "publish.js",
   "bin": {
     "git-publish": "./cli.js"
