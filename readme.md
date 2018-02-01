@@ -3,13 +3,13 @@
 Publish packages to a dedicated Git branch instead of to NPM
 
 ```bash
-npm install --save-dev git-publish
+npm install --save-dev @iddan/git-publish
 ```
 
 _or_
 
 ```bash
-yarn add --dev git-publish
+yarn add --dev @iddan/git-publish
 ```
 
 ### Why?
