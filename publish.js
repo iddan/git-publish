@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const os = require('os');
-const child_process = require('child_process');
+const childProcess = require('child_process');
 const util = require('util');
 
 const isGitClean = require('is-git-clean');
@@ -9,7 +9,7 @@ const npm = require('npm');
 const tar = require('tar');
 const ncp = require('ncp');
 
-const exec = util.promisify(child_process.exec);
+const exec = util.promisify(childProcess.exec);
 const rename = util.promisify(fs.rename);
 const mkdir = util.promisify(fs.mkdir);
 const realpath = util.promisify(fs.realpath);
@@ -17,15 +17,12 @@ const readFile = util.promisify(fs.readFile);
 
 /**
  * Publish an NPM package formatted code to a dedicated git branch
- * @param {string} branch - a dedicated git branch
+ * @param {string} cwd - package directory
  */
-module.exports = async function publish(branch = 'publish', cwd = process.cwd()) {
+module.exports = async function publish(cwd = process.cwd()) {
   const pkg = await getPackage(cwd);
   const tmpdir = await realpath(os.tmpdir());
   const currentBranch = await getCurrentBranch(cwd);
-  if (currentBranch === branch) {
-    throw new Error('Git branch must not be the publish branch');
-  }
   if (!await isGitClean(cwd)) {
     throw new Error('Git working directory not clean.');
   }
@@ -34,21 +31,38 @@ module.exports = async function publish(branch = 'publish', cwd = process.cwd())
   try {
     await mkdir(extractionDir);
   } catch (err) {
-    if (err.code != 'EEXIST') {
+    if (err.code !== 'EEXIST') {
       throw err;
     }
   }
   await tar.extract({file: tarball, cwd: extractionDir});
-  await exec('git checkout -B ' + branch, {cwd});
+  const publishBranch = await checkoutPublishBranch(cwd);
   await ncp(path.join(tmpdir, tarball, 'package'), cwd);
-  await rename('.npmignore', '.gitignore');
+  try {
+    await rename('.npmignore', '.gitignore');
+  } catch (err) {
+    if (err.code !== 'ENOENT') {
+      throw err;
+    }
+  }
   await exec('git rm -r --cached .');
   await exec('git add -A');
   await commit(pkg.version);
-  const tag = await createTag(pkg.version);
-  await exec('git push --set-upstream origin ' + branch);
+  let tag;
+  try {
+    tag = await createTag(pkg.version);
+  } catch (err) {
+    // Tag already exists
+    if (err.code === 128) {
+      await exec('git checkout ' + currentBranch);
+      console.error('Git tag v0.0.0 already exists. Please use different version or remove the tag before publishing');
+      process.exit(128);
+    }
+    throw err;
+  }
   await exec('git push origin ' + tag);
   await exec('git checkout ' + currentBranch);
+  await exec('git branch -D ' + publishBranch);
 };
 
 /**
@@ -107,7 +121,30 @@ function getMessage(version) {
 async function commit(version) {
   const message = getMessage(version);
   await exec('git add .');
-  return exec('git commit -m ' + message);
+  await exec('git commit -m ' + message);
+}
+
+/**
+ * @param {string} cwd
+ * @returns {string} checked-out publish branch
+ */
+async function checkoutPublishBranch(currentBranch, cwd) {
+  // Assuming commit hashes are unique to avoid duplications
+  const currentCommitHash = await getCurrentCommitHash();
+  const publishBranch = 'publish-' + currentCommitHash;
+  if (currentBranch === publishBranch) {
+    throw new Error('Git branch must not be the publish branch ' + publishBranch);
+  }
+  await exec('git checkout -B ' + publishBranch, {cwd});
+  return publishBranch;
+}
+
+/**
+ * @returns {string} current commit hash
+ */
+async function getCurrentCommitHash() {
+  const {stdout} = await exec('git rev-parse HEAD');
+  return stdout.trim();
 }
 
 /**
