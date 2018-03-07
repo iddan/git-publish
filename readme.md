@@ -1,6 +1,6 @@
 # Git Publish
 
-Publish packages to a dedicated Git branch instead of to NPM
+Publish packages as Git tags instead of to NPM
 
 ```bash
 npm install --save-dev @iddan/git-publish
