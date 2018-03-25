@@ -67,3 +67,7 @@ yarn add $GIT_REPOSITORY"#v"$VERSION
 ### Prior Art
 
 * [npm-git-publish](https://github.com/theoy/npm-git-publish)
+
+
+## License
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fiddan%2Fgit-publish.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Fiddan%2Fgit-publish?ref=badge_large)
