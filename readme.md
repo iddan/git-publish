@@ -1,6 +1,8 @@
-# Git Publish
-
-Publish packages to a dedicated Git branch instead of to NPM
+<center>
+  <img src="assets/git-publish.png" height="128" />
+  <h1>Git Publish</h1>
+  <p>Publish packages to a dedicated Git branch instead of to NPM</p>
+</center>
 
 ```bash
 npm install --save-dev @iddan/git-publish
