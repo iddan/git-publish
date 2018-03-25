@@ -1,4 +1,4 @@
-<center>
+<div align="center" href="">
   <p>
     <a href="https://npm.im/@iddan/git-publish">
       <img src="https://img.shields.io/npm/v/@iddan/git-publish.svg"
@@ -24,7 +24,7 @@
   <img src="assets/git-publish.png" height="128" />
   <h1>Git Publish</h1>
   <p>Publish packages as Git tags instead of to NPM</p>
-</center>
+</div>
 
 ```bash
 npm install --save-dev @iddan/git-publish
