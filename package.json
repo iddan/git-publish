@@ -9,7 +9,7 @@
     "commander": "^2.13.0",
     "is-git-clean": "^1.1.0",
     "ncp": "^2.0.0",
-    "npm": "^5.6.0",
+    "npm": "^6.13.4",
     "tar": "^4.3.0"
   },
   "devDependencies": {
